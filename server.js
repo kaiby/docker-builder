@@ -423,22 +423,21 @@ function loginPageHtml(errMsg = '', alreadyLoggedIn = false) {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>登录 — Docker Builder</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap');
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:#0f1117;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'IBM Plex Sans',sans-serif;}
+  body{background:#0f1117;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;}
   .card{background:#161b27;border:1px solid #242a38;border-radius:14px;padding:40px 36px;width:360px;}
   .logo{width:40px;height:40px;background:#4ade80;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 20px;}
   h1{text-align:center;font-size:18px;color:#fff;margin-bottom:6px;}
-  .sub{text-align:center;font-size:12px;color:#4b5563;font-family:'IBM Plex Mono',monospace;margin-bottom:28px;}
+  .sub{text-align:center;font-size:12px;color:#4b5563;font-family:'Courier New', Courier, monospace;margin-bottom:28px;}
   .fg{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
-  label{font-size:11px;color:#4b5563;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.7px;}
-  input{background:#0f1117;border:1px solid #2e3750;border-radius:7px;color:#d1d9e0;font-family:'IBM Plex Mono',monospace;font-size:13px;padding:10px 13px;outline:none;transition:border-color .2s;width:100%;}
+  label{font-size:11px;color:#4b5563;font-family:'Courier New', Courier, monospace;text-transform:uppercase;letter-spacing:.7px;}
+  input{background:#0f1117;border:1px solid #2e3750;border-radius:7px;color:#d1d9e0;font-family:'Courier New', Courier, monospace;font-size:13px;padding:10px 13px;outline:none;transition:border-color .2s;width:100%;}
   input:focus{border-color:#4ade80;}
-  .err{display:none;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.3);border-radius:7px;padding:9px 13px;font-size:12px;color:#f87171;font-family:'IBM Plex Mono',monospace;margin-bottom:14px;}
-  button{width:100%;padding:12px;background:#4ade80;border:none;border-radius:8px;color:#000;font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px;transition:all .2s;}
+  .err{display:none;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.3);border-radius:7px;padding:9px 13px;font-size:12px;color:#f87171;font-family:'Courier New', Courier, monospace;margin-bottom:14px;}
+  button{width:100%;padding:12px;background:#4ade80;border:none;border-radius:8px;color:#000;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px;transition:all .2s;}
   button:hover{background:#86efac;}
   button:disabled{opacity:.5;cursor:not-allowed;}
-  .tip{text-align:center;font-size:11px;color:#374151;font-family:'IBM Plex Mono',monospace;margin-top:20px;}
+  .tip{text-align:center;font-size:11px;color:#374151;font-family:'Courier New', Courier, monospace;margin-top:20px;}
 </style>
 </head>
 <body>
