@@ -336,8 +336,7 @@ router.post('/api/build', requireLogin, (req, res, next) => {
       send('cmd',  `$ cd ${deployPath} && unzip -o ${origFilename} -d dist/`);
       const distDir = path.join(deployPath, 'dist');
       if (fs.existsSync(distDir)) fs.rmSync(distDir, { recursive: true, force: true });
-      await runCmd('unzip', ['-o', origFilename, '-d', 'dist'], deployPath,
-        l => send('info', l), l => send('warn', l));
+      await runUnzip(origFilename, deployPath, () => {}, l => send('warn', l));
       send('ok', '✔ 解压完成', { progress: 22 });
     }
 
@@ -394,6 +393,65 @@ app.get('/', (req, res) => res.send(loginPageHtml()));
 
 
 // ── 工具函数 ──────────────────────────────────────────────────────────────────
+// ── 实时输出的 unzip（逐文件回调）────────────────────────────────────────────
+function runUnzip(zipFile, cwd, onOut, onErr) {
+  return new Promise((resolve, reject) => {
+    // 优先用 stdbuf 关闭行缓冲，确保每行立即输出
+    // 若 stdbuf 不存在则直接用 unzip
+    const hasStdbuf = (() => {
+      try { require('child_process').execSync('which stdbuf', { stdio: 'pipe' }); return true; }
+      catch { return false; }
+    })();
+
+    let cmd, args;
+    if (hasStdbuf) {
+      cmd  = 'stdbuf';
+      args = ['-oL', 'unzip', '-o', zipFile, '-d', 'dist'];
+    } else {
+      cmd  = 'unzip';
+      args = ['-o', zipFile, '-d', 'dist'];
+    }
+
+    const p = spawn(cmd, args, { cwd });
+
+    // unzip 的进度信息走 stdout，逐行实时推送
+    p.stdout.on('data', chunk => {
+      chunk.toString().split('\n').forEach(line => {
+        const l = line.trim();
+        if (!l) return;
+        // 格式化：提取文件名，让日志更简洁
+        if (l.startsWith('inflating:') || l.startsWith('extracting:') || l.startsWith('creating:')) {
+          const parts = l.split(':');
+          const action = parts[0].trim();
+          const file   = parts.slice(1).join(':').trim();
+          const icon   = action === 'creating' ? '📁' : '📄';
+          onOut(`${icon} ${action}: ${file}`);
+        } else {
+          onOut(l);
+        }
+      });
+    });
+
+    p.stderr.on('data', chunk => {
+      chunk.toString().split('\n').filter(Boolean).forEach(onErr);
+    });
+
+    p.on('close', code => code === 0 ? resolve() : reject(new Error(`unzip 退出码 ${code}`)));
+    p.on('error', err => {
+      // stdbuf 不存在时降级到普通 unzip
+      if (hasStdbuf && err.code === 'ENOENT') {
+        const p2 = spawn('unzip', ['-o', zipFile, '-d', 'dist'], { cwd });
+        p2.stdout.on('data', d => d.toString().split('\n').filter(Boolean).forEach(onOut));
+        p2.stderr.on('data', d => d.toString().split('\n').filter(Boolean).forEach(onErr));
+        p2.on('close', code => code === 0 ? resolve() : reject(new Error(`unzip 退出码 ${code}`)));
+        p2.on('error', reject);
+      } else {
+        reject(err);
+      }
+    });
+  });
+}
+
 function runCmd(cmd, args, cwd, onOut, onErr) {
   return new Promise((resolve, reject) => {
     const p = spawn(cmd, args, { cwd });
